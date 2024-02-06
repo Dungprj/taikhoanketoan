@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'account_data.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await AccountData.init();
   runApp(MyApp());
 }
 
@@ -26,7 +28,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  TextEditingController searchController = TextEditingController();
+  final TextEditingController searchController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
@@ -62,6 +65,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           Expanded(
             child: ListView.builder(
+              controller: _scrollController,
               itemCount: AccountData.searchAccounts(searchController.text).length,
               itemBuilder: (context, index) {
                 var account = AccountData.searchAccounts(searchController.text)[index];
@@ -83,6 +87,17 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // Scroll to the top of the list when the button is pressed
+          _scrollController.animateTo(
+            0.0,
+            curve: Curves.easeInOut,
+            duration: Duration(milliseconds: 300),
+          );
+        },
+        child: Icon(Icons.arrow_upward),
       ),
     );
   }
